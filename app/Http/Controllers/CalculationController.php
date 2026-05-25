@@ -60,7 +60,8 @@ class CalculationController extends Controller
             $costBase,
             $project->depreciation_years,
             $productionsArray,
-            $project->total_reserve ?? 0.0
+            $project->total_reserve ?? 0.0,
+            $project->custom_depreciation_rate
         );
 
         // 3. Get cash flow (NCF and Cumulative NCF)
@@ -80,6 +81,7 @@ class CalculationController extends Controller
                 'predicted' => $predicted->pluck('production', 'year')->toArray(),
                 'linearCurve' => $linearCurve,
                 'quadraticCurve' => $quadraticCurve,
+                'decline_rate' => $project->decline_rate,
             ],
             'depreciation' => [
                 'chosen_method' => $project->depreciation_method,

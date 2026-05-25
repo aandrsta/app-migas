@@ -35,7 +35,8 @@ class CashFlowService
             $costBase,
             $depreciationYears,
             $productions,
-            $project->total_reserve ?? 0.0
+            $project->total_reserve ?? 0.0,
+            $project->custom_depreciation_rate
         );
 
         $cashFlow = [];

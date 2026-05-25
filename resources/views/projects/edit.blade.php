@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="solid-card" style="max-width: 800px; margin: 0 auto;">
         <!-- Step Indicators -->
         <div class="wizard-steps">
             <div class="step-indicator active" id="step-indicator-1">
@@ -122,14 +122,28 @@
                     <i class="fa-solid fa-sliders"></i> Konfigurasi Prediksi & Depresiasi
                 </h3>
 
-                <div class="form-group">
-                    <label class="form-label" for="prediction_years">Target Prediksi Masa Depan (Tahun)</label>
-                    <input type="number" id="prediction_years" name="prediction_years" class="form-control" value="{{ old('prediction_years', $project->prediction_years) }}" required min="1" max="100" placeholder="Contoh: 16" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="prediction_years">Target Prediksi Masa Depan (Tahun)</label>
+                        <input type="number" id="prediction_years" name="prediction_years" class="form-control" value="{{ old('prediction_years', $project->prediction_years) }}" required min="1" max="100" placeholder="Contoh: 16" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="decline_rate">Laju Penurunan Produksi / Decline Rate (%) <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: none;">(Opsional)</span></label>
+                        <input type="number" step="any" id="decline_rate" name="decline_rate" class="form-control" value="{{ old('decline_rate', $project->decline_rate) }}" placeholder="Contoh: 10 (Gunakan Decline Curve)" />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="depreciation_years">Durasi Depresiasi Investasi (Tahun)</label>
-                    <input type="number" id="depreciation_years" name="depreciation_years" class="form-control" value="{{ old('depreciation_years', $project->depreciation_years) }}" required min="1" max="100" placeholder="Jangka waktu depresiasi (Contoh: 20)" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="depreciation_years">Durasi Depresiasi Investasi (Tahun)</label>
+                        <input type="number" id="depreciation_years" name="depreciation_years" class="form-control" value="{{ old('depreciation_years', $project->depreciation_years) }}" required min="1" max="100" placeholder="Contoh: 10" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="custom_depreciation_rate">Laju Depresiasi Kustom (%) <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: none;">(Opsional)</span></label>
+                        <input type="number" step="any" id="custom_depreciation_rate" name="custom_depreciation_rate" class="form-control" value="{{ old('custom_depreciation_rate', $project->custom_depreciation_rate) }}" placeholder="Default otomatis: 1/N atau 2/N" />
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -240,7 +254,7 @@
                         isValid = false;
                         input.style.borderColor = 'var(--rose)';
                         input.addEventListener('input', function() {
-                            input.style.borderColor = 'var(--glass-border)';
+                            input.style.borderColor = 'var(--border-dim)';
                         }, { once: true });
                     } else if (input.type === 'number' && input.value !== '' && parseFloat(input.value) < 0) {
                         if (input.id !== 'total_reserve' || methodSelect.value === 'unit_of_production') {

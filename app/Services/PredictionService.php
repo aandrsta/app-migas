@@ -163,9 +163,10 @@ class PredictionService
      * @param array $knownYears Known years (e.g. [1, 2, 3, 4])
      * @param array $knownProduction Known production values in MBBL
      * @param int $totalYears Total years (known + predicted, e.g. 20 years)
+     * @param float|null $declineRate Custom production decline rate in percent (0-100)
      * @return array Predictions and regression parameters
      */
-    public function predict(array $knownYears, array $knownProduction, int $totalYears): array
+    public function predict(array $knownYears, array $knownProduction, int $totalYears, float $declineRate = null): array
     {
         $linear = $this->linearRegression($knownYears, $knownProduction);
         $quadratic = $this->quadraticRegression($knownYears, $knownProduction);
@@ -178,10 +179,17 @@ class PredictionService
             $predictions[$knownYears[$i]] = (double) $knownProduction[$i];
         }
 
-        // 2. Predict future years using linear regression (min 0)
+        // 2. Predict future years
         $lastKnownYear = empty($knownYears) ? 0 : max($knownYears);
         for ($year = $lastKnownYear + 1; $year <= $totalYears; $year++) {
-            $val = ($linear['m'] * $year) + $linear['b'];
+            if ($declineRate !== null && $declineRate > 0) {
+                // Apply exponential or annual production decline rate from previous year
+                $prevVal = $predictions[$year - 1] ?? 0.0;
+                $val = $prevVal * (1.0 - ($declineRate / 100.0));
+            } else {
+                // Use linear regression
+                $val = ($linear['m'] * $year) + $linear['b'];
+            }
             $predictions[$year] = max(0.0, round($val, 4));
         }
 

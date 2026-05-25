@@ -23,12 +23,12 @@ class DepreciationService
     /**
      * Declining Balance Method: Di = Cost * R * (1-R)^(i-1), where R = 1/N
      */
-    public function decliningBalance(float $cost, int $years): array
+    public function decliningBalance(float $cost, int $years, float $customRate = null): array
     {
         $depreciation = [];
         if ($years <= 0) return [];
 
-        $rate = 1.0 / $years;
+        $rate = ($customRate !== null && $customRate > 0) ? ($customRate / 100.0) : (1.0 / $years);
         $bookValue = $cost;
 
         for ($i = 1; $i <= $years; $i++) {
@@ -48,12 +48,12 @@ class DepreciationService
     /**
      * Double Declining Balance Method: Di = BookValue * (2/N)
      */
-    public function doubleDeclining(float $cost, int $years): array
+    public function doubleDeclining(float $cost, int $years, float $customRate = null): array
     {
         $depreciation = [];
         if ($years <= 0) return [];
 
-        $rate = 2.0 / $years;
+        $rate = ($customRate !== null && $customRate > 0) ? ($customRate / 100.0) : (2.0 / $years);
         $bookValue = $cost;
 
         for ($i = 1; $i <= $years; $i++) {
@@ -121,15 +121,15 @@ class DepreciationService
     /**
      * Dispatcher method to calculate depreciation based on chosen method.
      */
-    public function calculate(string $method, float $cost, int $years, array $productions = [], float $reserve = 0.0): array
+    public function calculate(string $method, float $cost, int $years, array $productions = [], float $reserve = 0.0, float $customRate = null): array
     {
         switch ($method) {
             case 'straight_line':
                 return $this->straightLine($cost, $years);
             case 'declining_balance':
-                return $this->decliningBalance($cost, $years);
+                return $this->decliningBalance($cost, $years, $customRate);
             case 'double_declining':
-                return $this->doubleDeclining($cost, $years);
+                return $this->doubleDeclining($cost, $years, $customRate);
             case 'unit_of_production':
                 return $this->unitOfProduction($cost, $productions, $reserve);
             case 'sum_of_year':
@@ -142,12 +142,12 @@ class DepreciationService
     /**
      * Calculate all methods to provide comparison data (for charting in Phase 5).
      */
-    public function calculateAll(float $cost, int $years, array $productions = [], float $reserve = 0.0): array
+    public function calculateAll(float $cost, int $years, array $productions = [], float $reserve = 0.0, float $customRate = null): array
     {
         return [
             'straight_line' => $this->straightLine($cost, $years),
-            'declining_balance' => $this->decliningBalance($cost, $years),
-            'double_declining' => $this->doubleDeclining($cost, $years),
+            'declining_balance' => $this->decliningBalance($cost, $years, $customRate),
+            'double_declining' => $this->doubleDeclining($cost, $years, $customRate),
             'unit_of_production' => $this->unitOfProduction($cost, $productions, $reserve),
             'sum_of_year' => $this->sumOfYear($cost, $years),
         ];

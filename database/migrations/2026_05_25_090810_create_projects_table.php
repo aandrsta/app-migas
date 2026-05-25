@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('depreciation_method');
             $table->double('discount_rate');
             $table->double('total_reserve')->nullable();
+            $table->double('decline_rate')->nullable();
+            $table->double('custom_depreciation_rate')->nullable();
             $table->timestamps();
         });
     }

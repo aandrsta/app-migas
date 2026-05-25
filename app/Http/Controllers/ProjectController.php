@@ -70,6 +70,8 @@ class ProjectController extends Controller
             'depreciation_method' => 'required|string|in:straight_line,declining_balance,double_declining,unit_of_production,sum_of_year',
             'discount_rate' => 'required|numeric|min:0|max:100',
             'total_reserve' => 'nullable|numeric|min:0',
+            'decline_rate' => 'nullable|numeric|min:0|max:100',
+            'custom_depreciation_rate' => 'nullable|numeric|min:0|max:100',
             'production' => 'required|array',
             'production.*' => 'required|numeric|min:0',
         ];
@@ -95,6 +97,8 @@ class ProjectController extends Controller
             'depreciation_method' => $validated['depreciation_method'],
             'discount_rate' => $validated['discount_rate'],
             'total_reserve' => $validated['total_reserve'] ?? null,
+            'decline_rate' => $validated['decline_rate'] ?? null,
+            'custom_depreciation_rate' => $validated['custom_depreciation_rate'] ?? null,
         ]);
 
         // 2. Save known actual production data
@@ -148,7 +152,8 @@ class ProjectController extends Controller
             $costBase,
             $project->depreciation_years,
             $productionsArray,
-            $project->total_reserve ?? 0.0
+            $project->total_reserve ?? 0.0,
+            $project->custom_depreciation_rate
         );
 
         // 4. Calculate economic indicators
@@ -213,6 +218,8 @@ class ProjectController extends Controller
             'depreciation_method' => 'required|string|in:straight_line,declining_balance,double_declining,unit_of_production,sum_of_year',
             'discount_rate' => 'required|numeric|min:0|max:100',
             'total_reserve' => 'nullable|numeric|min:0',
+            'decline_rate' => 'nullable|numeric|min:0|max:100',
+            'custom_depreciation_rate' => 'nullable|numeric|min:0|max:100',
             'production' => 'required|array',
             'production.*' => 'required|numeric|min:0',
         ];
@@ -237,6 +244,8 @@ class ProjectController extends Controller
             'depreciation_method' => $validated['depreciation_method'],
             'discount_rate' => $validated['discount_rate'],
             'total_reserve' => $validated['total_reserve'] ?? null,
+            'decline_rate' => $validated['decline_rate'] ?? null,
+            'custom_depreciation_rate' => $validated['custom_depreciation_rate'] ?? null,
         ]);
 
         // 2. Replace production data: delete all old production data first
@@ -287,7 +296,8 @@ class ProjectController extends Controller
         $predResult = $this->predictionService->predict(
             $knownYears,
             $knownProd,
-            $project->known_years + $project->prediction_years
+            $project->known_years + $project->prediction_years,
+            $project->decline_rate
         );
 
         // 3. Save forecasted production data to DB

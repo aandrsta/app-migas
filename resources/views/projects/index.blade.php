@@ -9,7 +9,7 @@
     </div>
 
     @if($projects->isEmpty())
-        <div class="glass-card">
+        <div class="solid-card">
             <div class="empty-state">
                 <div class="empty-icon">
                     <i class="fa-solid fa-folder-open"></i>
@@ -26,7 +26,7 @@
     @else
         <div class="projects-grid">
             @foreach($projects as $project)
-                <div class="glass-card glow-cyan" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="solid-card glow-cyan" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <div class="project-card-header">
                             <div>

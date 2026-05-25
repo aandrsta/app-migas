@@ -21,6 +21,8 @@ class Project extends Model
         'depreciation_method',
         'discount_rate',
         'total_reserve',
+        'decline_rate',
+        'custom_depreciation_rate',
     ];
 
     public function user()

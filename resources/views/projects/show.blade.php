@@ -355,10 +355,10 @@
 
         // Fetch chart data on load and render charts
         document.addEventListener('DOMContentLoaded', function() {
-            // Dark mode colors for ChartJs
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-            Chart.defaults.font.family = "'Inter', sans-serif";
+            // Warm-paper editorial light theme colors for Chart.js
+            Chart.defaults.color = '#3a3a3a';
+            Chart.defaults.borderColor = 'rgba(26, 26, 26, 0.08)';
+            Chart.defaults.font.family = "'Instrument Sans', sans-serif";
 
             fetch("{{ route('projects.chart-data', $project) }}")
                 .then(res => res.json())
@@ -403,27 +403,27 @@
                         {
                             label: 'Produksi Aktual',
                             data: actualDataset,
-                            borderColor: '#06b6d4',
-                            backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                            borderColor: '#0054a6',
+                            backgroundColor: 'rgba(0, 84, 166, 0.04)',
                             borderWidth: 3,
-                            pointBackgroundColor: '#06b6d4',
+                            pointBackgroundColor: '#0054a6',
                             fill: true,
                             tension: 0.15
                         },
                         {
-                            label: 'Proyeksi Linier',
+                            label: data.production.decline_rate ? 'Proyeksi Decline (' + data.production.decline_rate + '%)' : 'Proyeksi Linier',
                             data: predictedDataset,
-                            borderColor: '#f59e0b',
+                            borderColor: '#ffd200',
                             borderDash: [5, 5],
                             borderWidth: 3,
-                            pointBackgroundColor: '#f59e0b',
+                            pointBackgroundColor: '#ffd200',
                             fill: false,
                             tension: 0.1
                         },
                         {
                             label: 'Tren Regresi Linier (y=mx+b)',
                             data: linearDataset,
-                            borderColor: 'rgba(245, 158, 11, 0.35)',
+                            borderColor: 'rgba(255, 210, 0, 0.35)',
                             borderWidth: 1.5,
                             pointRadius: 0,
                             fill: false
@@ -431,7 +431,7 @@
                         {
                             label: 'Pembanding Kuadratik',
                             data: quadraticDataset,
-                            borderColor: 'rgba(139, 92, 246, 0.45)',
+                            borderColor: 'rgba(127, 0, 255, 0.45)',
                             borderDash: [2, 3],
                             borderWidth: 2,
                             pointRadius: 0,
@@ -468,50 +468,50 @@
                 {
                     label: 'Straight Line',
                     data: Object.values(comparison.straight_line),
-                    borderColor: '#06b6d4',
+                    borderColor: '#0054a6',
                     borderWidth: chosenMethod === 'straight_line' ? 3.5 : 1.5,
                     borderDash: chosenMethod === 'straight_line' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'straight_line' ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
+                    backgroundColor: chosenMethod === 'straight_line' ? 'rgba(0, 84, 166, 0.12)' : 'transparent',
                     type: chosenMethod === 'straight_line' ? 'bar' : 'line',
                     fill: false
                 },
                 {
                     label: 'Declining Balance',
                     data: Object.values(comparison.declining_balance),
-                    borderColor: '#f59e0b',
+                    borderColor: '#ffd200',
                     borderWidth: chosenMethod === 'declining_balance' ? 3.5 : 1.5,
                     borderDash: chosenMethod === 'declining_balance' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'declining_balance' ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                    backgroundColor: chosenMethod === 'declining_balance' ? 'rgba(255, 210, 0, 0.12)' : 'transparent',
                     type: chosenMethod === 'declining_balance' ? 'bar' : 'line',
                     fill: false
                 },
                 {
                     label: 'Double Declining',
                     data: Object.values(comparison.double_declining),
-                    borderColor: '#10b981',
+                    borderColor: '#118a44',
                     borderWidth: chosenMethod === 'double_declining' ? 3.5 : 1.5,
                     borderDash: chosenMethod === 'double_declining' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'double_declining' ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                    backgroundColor: chosenMethod === 'double_declining' ? 'rgba(17, 138, 68, 0.12)' : 'transparent',
                     type: chosenMethod === 'double_declining' ? 'bar' : 'line',
                     fill: false
                 },
                 {
                     label: 'Unit of Production',
                     data: Object.values(comparison.unit_of_production),
-                    borderColor: '#f43f5e',
+                    borderColor: '#da251d',
                     borderWidth: chosenMethod === 'unit_of_production' ? 3.5 : 1.5,
                     borderDash: chosenMethod === 'unit_of_production' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'unit_of_production' ? 'rgba(244, 63, 94, 0.15)' : 'transparent',
+                    backgroundColor: chosenMethod === 'unit_of_production' ? 'rgba(218, 37, 29, 0.12)' : 'transparent',
                     type: chosenMethod === 'unit_of_production' ? 'bar' : 'line',
                     fill: false
                 },
                 {
                     label: 'Sum of Year',
                     data: Object.values(comparison.sum_of_year),
-                    borderColor: '#8b5cf6',
+                    borderColor: '#7f00ff',
                     borderWidth: chosenMethod === 'sum_of_year' ? 3.5 : 1.5,
                     borderDash: chosenMethod === 'sum_of_year' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'sum_of_year' ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
+                    backgroundColor: chosenMethod === 'sum_of_year' ? 'rgba(127, 0, 255, 0.12)' : 'transparent',
                     type: chosenMethod === 'sum_of_year' ? 'bar' : 'line',
                     fill: false
                 }
@@ -545,8 +545,8 @@
             const cumulativeValues = Object.values(data.cash_flow.cumulative_ncf);
 
             // Generate conditional bar colors (green for positive, red for negative)
-            const barColors = ncfValues.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.55)' : 'rgba(244, 63, 94, 0.55)');
-            const borderColors = ncfValues.map(v => v >= 0 ? '#10b981' : '#f43f5e');
+            const barColors = ncfValues.map(v => v >= 0 ? 'rgba(17, 138, 68, 0.65)' : 'rgba(218, 37, 29, 0.65)');
+            const borderColors = ncfValues.map(v => v >= 0 ? '#118a44' : '#da251d');
 
             cfChart = new Chart(ctx, {
                 data: {
@@ -565,9 +565,9 @@
                             type: 'line',
                             label: 'Kumulatif NCF',
                             data: cumulativeValues,
-                            borderColor: '#8b5cf6',
+                            borderColor: '#7f00ff',
                             borderWidth: 3,
-                            pointBackgroundColor: '#8b5cf6',
+                            pointBackgroundColor: '#7f00ff',
                             fill: false,
                             yAxisID: 'y2',
                             tension: 0.1
@@ -612,10 +612,10 @@
                     datasets: [{
                         label: 'NPV Proyek',
                         data: npvs,
-                        borderColor: '#06b6d4',
-                        backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                        borderColor: '#0054a6',
+                        backgroundColor: 'rgba(0, 84, 166, 0.04)',
                         borderWidth: 3,
-                        pointBackgroundColor: '#06b6d4',
+                        pointBackgroundColor: '#0054a6',
                         pointHoverRadius: 7,
                         fill: true,
                         tension: 0.15
