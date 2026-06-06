@@ -38,46 +38,23 @@
     <!-- TAB 1: PRODUCTION FORECAST -->
     <!-- ========================================== -->
     <div class="tab-pane active" id="tab-produksi">
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
-            <!-- Chart Container -->
-            <div class="glass-card">
-                <h3 style="margin-bottom: 1.5rem; color: var(--cyan);"><i class="fa-solid fa-chart-line"></i> Grafik Proyeksi Produksi (MBBL)</h3>
-                <div style="position: relative; height: 380px; width: 100%;">
-                    <canvas id="productionChart"></canvas>
+        <!-- Production Decline Chart Card (Premium Light-Themed Red/White) -->
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-dim); padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
+                <div>
+                    <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--rose); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.25rem;">06 / CHART</span>
+                    <h2 style="font-family: var(--font-sans); font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.02em; text-transform: uppercase; margin: 0; border: none; padding: 0;">PRODUCTION DECLINE CHART</h2>
+                    <span style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 0.35rem;">Production forecasting and decline curve visualization</span>
+                </div>
+                <div>
+                    <span style="display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(218, 37, 29, 0.2); background: rgba(218, 37, 29, 0.03); color: var(--rose); padding: 0.4rem 0.8rem; font-size: 0.7rem; font-family: var(--font-mono); font-weight: 700; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.1em;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--rose); display: inline-block;"></span>
+                        FORECAST ANALYSIS
+                    </span>
                 </div>
             </div>
-
-            <!-- Regression Info Box -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div class="glass-card glow-cyan">
-                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--amber);">
-                        <i class="fa-solid fa-square-root-variable"></i> Hasil Regresi Linier
-                    </h3>
-                    <div style="font-size: 1.35rem; font-weight: 700; font-family: monospace; color: var(--text-primary); margin: 0.5rem 0;">
-                        y = {{ number_format($linearRegression['m'], 4) }}x + {{ number_format($linearRegression['b'], 2) }}
-                    </div>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                        Digunakan untuk memproyeksikan data produksi tahun ke-{{ $project->known_years + 1 }} sampai ke-{{ $project->known_years + $project->prediction_years }}.
-                    </p>
-                    <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
-                        Nilai Koefisien R²: <span style="color: var(--cyan); font-weight: bold;">{{ number_format($linearRegression['r_squared'], 4) }}</span>
-                    </div>
-                </div>
-
-                <div class="glass-card glow-cyan">
-                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--violet);">
-                        <i class="fa-solid fa-chart-curve"></i> Kurva Regresi Kuadratik
-                    </h3>
-                    <div style="font-size: 1.2rem; font-weight: 700; font-family: monospace; color: var(--text-primary); margin: 0.5rem 0; word-break: break-all;">
-                        y = {{ number_format($quadraticRegression['a'], 3) }}x² + {{ number_format($quadraticRegression['b'], 3) }}x + {{ number_format($quadraticRegression['c'], 2) }}
-                    </div>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                        Kurva pembanding kuadratik untuk mengukur kesesuaian tren peningkatan/penurunan produksi lapangan.
-                    </p>
-                    <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
-                        Nilai Koefisien R²: <span style="color: var(--violet); font-weight: bold;">{{ number_format($quadraticRegression['r_squared'], 4) }}</span>
-                    </div>
-                </div>
+            <div style="position: relative; height: 450px; width: 100%;">
+                <canvas id="productionDeclineChart"></canvas>
             </div>
         </div>
 
@@ -118,16 +95,6 @@
     <!-- ========================================== -->
     <div class="tab-pane" id="tab-depresiasi">
         <div class="glass-card">
-            <h3 style="margin-bottom: 1.5rem; color: var(--cyan);"><i class="fa-solid fa-chart-column"></i> Perbandingan Kurva Depresiasi ($M)</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 700px;">
-                Grafik di bawah memperbandingkan metode depresiasi **{{ str_replace('_', ' ', $project->depreciation_method) }}** yang Anda pilih (bar berwarna solid) dengan metode-metode lainnya (garis putus-putus) untuk dasar investasi sebesar **${{ number_format($project->capital_cost + $project->non_capital_cost, 2) }} M**.
-            </p>
-            <div style="position: relative; height: 380px; width: 100%;">
-                <canvas id="depreciationChart"></canvas>
-            </div>
-        </div>
-
-        <div class="glass-card" style="margin-top: 2rem;">
             <h3 style="margin-bottom: 1rem; color: var(--text-primary);"><i class="fa-solid fa-calculator"></i> Tabel Depresiasi Metode Pilihan</h3>
             <div class="table-responsive">
                 <table class="premium-table">
@@ -286,49 +253,40 @@
             </div>
         </div>
 
-        <!-- 5 Stat Cards Grid -->
+        <!-- Calculation of simplified metrics -->
+        @php
+            $totalInvestment = $project->capital_cost + $project->non_capital_cost;
+            $totalNcf = $project->calculations->where('year', '>', 0)->sum('ncf');
+            $netProfit = $project->calculations->sum('ncf');
+        @endphp
+
+        <!-- Simplified Stat Cards Grid -->
         <div class="stats-grid">
-            <div class="stat-card stat-amber">
-                <span class="stat-label">POT (Pay Out Time)</span>
-                <div class="stat-value">{{ $pot !== null ? $pot . ' Thn' : 'Never' }}</div>
-                <span class="stat-desc">Waktu pengembalian investasi modal (Capital)</span>
+            <div class="stat-card stat-cyan">
+                <span class="stat-label">Total NCF</span>
+                <div class="stat-value">${{ number_format($totalNcf, 2) }} M</div>
+                <span class="stat-desc">Total aliran kas masuk bersih selama umur proyek</span>
+            </div>
+
+            <div class="stat-card stat-rose">
+                <span class="stat-label">Total Investment</span>
+                <div class="stat-value">${{ number_format($totalInvestment, 2) }} M</div>
+                <span class="stat-desc">Total modal awal (Capital + Non-Capital Cost)</span>
+            </div>
+
+            <div class="stat-card {{ $netProfit >= 0 ? 'stat-emerald' : 'stat-rose' }}">
+                <span class="stat-label">Net Profit</span>
+                <div class="stat-value">{{ $netProfit >= 0 ? '+' : '' }}${{ number_format($netProfit, 2) }} M</div>
+                <span class="stat-desc">Keuntungan bersih kotor (Total NCF - Investasi)</span>
             </div>
 
             <div class="stat-card {{ $npv >= 0 ? 'stat-emerald' : 'stat-rose' }}">
                 <span class="stat-label">NPV (Net Present Value)</span>
                 <div class="stat-value">${{ number_format($npv, 2) }} M</div>
-                <span class="stat-desc">Nilai bersih proyek saat ini (discounted)</span>
-            </div>
-
-            <div class="stat-card {{ $irr >= $project->discount_rate ? 'stat-emerald' : 'stat-rose' }}">
-                <span class="stat-label">IRR (Internal Rate of Return)</span>
-                <div class="stat-value">{{ $irr }} %</div>
-                <span class="stat-desc">Kemampuan pengembalian bunga proyek (ROR)</span>
-            </div>
-
-            <div class="stat-card stat-cyan">
-                <span class="stat-label">PIR (Profitability Index)</span>
-                <div class="stat-value">{{ $pir }}</div>
-                <span class="stat-desc">Rasio keuntungan undiscounted vs investasi</span>
-            </div>
-
-            <div class="stat-card stat-violet">
-                <span class="stat-label">DPR (Discounted Profitability)</span>
-                <div class="stat-value">{{ $dpr }}</div>
-                <span class="stat-desc">Rasio keuntungan discounted vs PV investasi</span>
+                <span class="stat-desc">Keuntungan bersih disesuaikan suku bunga (discounted)</span>
             </div>
         </div>
 
-        <!-- Sensitivity Chart -->
-        <div class="glass-card">
-            <h3 style="margin-bottom: 1.5rem; color: var(--cyan);"><i class="fa-solid fa-chart-area"></i> Sensitivitas NPV vs Suku Bunga (Discount Rate)</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 700px;">
-                Grafik di bawah menggambarkan sensitivitas NPV proyek pada rentang discount rate dari 0% hingga 50%. Titik potong garis dengan sumbu horizontal (NPV = 0) menunjukkan nilai **IRR ({{ $irr }}%)**.
-            </p>
-            <div style="position: relative; height: 380px; width: 100%;">
-                <canvas id="sensitivityChart"></canvas>
-            </div>
-        </div>
     </div>
 
     <!-- ========================================== -->
@@ -351,92 +309,59 @@
         }
 
         // Global Chart variables so we can destroy/init
-        let prodChart, depChart, cfChart, sensChart;
+        let prodChart, cfChart;
 
         // Fetch chart data on load and render charts
         document.addEventListener('DOMContentLoaded', function() {
-            // Warm-paper editorial light theme colors for Chart.js
-            Chart.defaults.color = '#3a3a3a';
-            Chart.defaults.borderColor = 'rgba(26, 26, 26, 0.08)';
+            // Light warm-paper colors for Chart.js
             Chart.defaults.font.family = "'Instrument Sans', sans-serif";
 
             fetch("{{ route('projects.chart-data', $project) }}")
                 .then(res => res.json())
                 .then(data => {
-                    renderProductionChart(data);
-                    renderDepreciationChart(data);
+                    renderProductionDeclineChart(data);
                     renderCashFlowChart(data);
-                    renderSensitivityChart(data);
                 })
                 .catch(err => console.error("Gagal memuat grafik:", err));
         });
 
-        // 1. Render Production Forecast Chart
-        function renderProductionChart(data) {
-            const ctx = document.getElementById('productionChart').getContext('2d');
+        // Render Production Decline Chart (Continuous unified line)
+        function renderProductionDeclineChart(data) {
+            const ctx = document.getElementById('productionDeclineChart').getContext('2d');
             
-            // Map actual and predicted data to full years range so they connect
             const years = data.years;
-            const actualDataset = [];
-            const predictedDataset = [];
-            const linearDataset = [];
-            const quadraticDataset = [];
+            const combinedDataset = [];
 
             years.forEach(yr => {
-                actualDataset.push(data.production.actual[yr] !== undefined ? data.production.actual[yr] : null);
-                predictedDataset.push(data.production.predicted[yr] !== undefined ? data.production.predicted[yr] : null);
-                linearDataset.push(data.production.linearCurve[yr] !== undefined ? data.production.linearCurve[yr] : null);
-                quadraticDataset.push(data.production.quadraticCurve[yr] !== undefined ? data.production.quadraticCurve[yr] : null);
+                const val = data.production.actual[yr] !== undefined 
+                    ? data.production.actual[yr] 
+                    : (data.production.predicted[yr] !== undefined ? data.production.predicted[yr] : 0.0);
+                combinedDataset.push(val);
             });
 
-            // Connect actual with predicted for beautiful solid flow
-            const lastKnownYear = {{ $project->known_years }};
-            if(data.production.actual[lastKnownYear] !== undefined) {
-                predictedDataset[lastKnownYear - 1] = data.production.actual[lastKnownYear];
-            }
+            // Create gradient fill for red theme
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(218, 37, 29, 0.15)');
+            gradient.addColorStop(1, 'rgba(218, 37, 29, 0.0)');
 
             prodChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: years.map(yr => 'Thn ' + yr),
+                    labels: years.map(yr => yr),
                     datasets: [
                         {
-                            label: 'Produksi Aktual',
-                            data: actualDataset,
-                            borderColor: '#0054a6',
-                            backgroundColor: 'rgba(0, 84, 166, 0.04)',
+                            label: 'Oil Production (M bbl)',
+                            data: combinedDataset,
+                            borderColor: '#da251d', // Pertamina Red
+                            backgroundColor: gradient,
                             borderWidth: 3,
-                            pointBackgroundColor: '#0054a6',
+                            pointBackgroundColor: '#da251d',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 1.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
                             fill: true,
-                            tension: 0.15
-                        },
-                        {
-                            label: data.production.decline_rate ? 'Proyeksi Decline (' + data.production.decline_rate + '%)' : 'Proyeksi Linier',
-                            data: predictedDataset,
-                            borderColor: '#ffd200',
-                            borderDash: [5, 5],
-                            borderWidth: 3,
-                            pointBackgroundColor: '#ffd200',
-                            fill: false,
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Tren Regresi Linier (y=mx+b)',
-                            data: linearDataset,
-                            borderColor: 'rgba(255, 210, 0, 0.35)',
-                            borderWidth: 1.5,
-                            pointRadius: 0,
-                            fill: false
-                        },
-                        {
-                            label: 'Pembanding Kuadratik',
-                            data: quadraticDataset,
-                            borderColor: 'rgba(127, 0, 255, 0.45)',
-                            borderDash: [2, 3],
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: false,
-                            tension: 0.25
+                            tension: 0.3
                         }
                     ]
                 },
@@ -444,107 +369,69 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 15, padding: 15 } }
+                        legend: { 
+                            position: 'top', 
+                            labels: { 
+                                color: '#3a3a3a',
+                                boxWidth: 15, 
+                                padding: 15,
+                                font: {
+                                    size: 11,
+                                    weight: 'bold'
+                                }
+                            } 
+                        },
+                        tooltip: {
+                            backgroundColor: '#ffffff',
+                            titleColor: '#111111',
+                            bodyColor: '#3a3a3a',
+                            borderColor: 'rgba(218, 37, 29, 0.2)',
+                            borderWidth: 1,
+                            cornerRadius: 4,
+                            padding: 10
+                        }
                     },
                     scales: {
-                        y: { title: { display: true, text: 'Volume Produksi (MBBL)' } }
+                        y: { 
+                            grid: { 
+                                color: 'rgba(26, 26, 26, 0.06)',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                color: '#3a3a3a',
+                                font: {
+                                    family: "'JetBrains Mono', monospace",
+                                    size: 10
+                                }
+                            } 
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(26, 26, 26, 0.06)',
+                                borderDash: [3, 3],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#3a3a3a',
+                                font: {
+                                    family: "'JetBrains Mono', monospace",
+                                    size: 10
+                                }
+                            }
+                        }
                     }
                 }
             });
         }
 
-        // 2. Render Depreciation Comparison Chart
-        function renderDepreciationChart(data) {
-            const ctx = document.getElementById('depreciationChart').getContext('2d');
-            const chosenMethod = data.depreciation.chosen_method;
-            const comparison = data.depreciation.comparison;
-
-            // Generate X labels
-            const yearsCount = Object.keys(comparison.straight_line).length;
-            const labels = Array.from({length: yearsCount}, (_, i) => 'Thn ' + (i + 1));
-
-            // Map data
-            const datasets = [
-                {
-                    label: 'Straight Line',
-                    data: Object.values(comparison.straight_line),
-                    borderColor: '#0054a6',
-                    borderWidth: chosenMethod === 'straight_line' ? 3.5 : 1.5,
-                    borderDash: chosenMethod === 'straight_line' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'straight_line' ? 'rgba(0, 84, 166, 0.12)' : 'transparent',
-                    type: chosenMethod === 'straight_line' ? 'bar' : 'line',
-                    fill: false
-                },
-                {
-                    label: 'Declining Balance',
-                    data: Object.values(comparison.declining_balance),
-                    borderColor: '#ffd200',
-                    borderWidth: chosenMethod === 'declining_balance' ? 3.5 : 1.5,
-                    borderDash: chosenMethod === 'declining_balance' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'declining_balance' ? 'rgba(255, 210, 0, 0.12)' : 'transparent',
-                    type: chosenMethod === 'declining_balance' ? 'bar' : 'line',
-                    fill: false
-                },
-                {
-                    label: 'Double Declining',
-                    data: Object.values(comparison.double_declining),
-                    borderColor: '#118a44',
-                    borderWidth: chosenMethod === 'double_declining' ? 3.5 : 1.5,
-                    borderDash: chosenMethod === 'double_declining' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'double_declining' ? 'rgba(17, 138, 68, 0.12)' : 'transparent',
-                    type: chosenMethod === 'double_declining' ? 'bar' : 'line',
-                    fill: false
-                },
-                {
-                    label: 'Unit of Production',
-                    data: Object.values(comparison.unit_of_production),
-                    borderColor: '#da251d',
-                    borderWidth: chosenMethod === 'unit_of_production' ? 3.5 : 1.5,
-                    borderDash: chosenMethod === 'unit_of_production' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'unit_of_production' ? 'rgba(218, 37, 29, 0.12)' : 'transparent',
-                    type: chosenMethod === 'unit_of_production' ? 'bar' : 'line',
-                    fill: false
-                },
-                {
-                    label: 'Sum of Year',
-                    data: Object.values(comparison.sum_of_year),
-                    borderColor: '#7f00ff',
-                    borderWidth: chosenMethod === 'sum_of_year' ? 3.5 : 1.5,
-                    borderDash: chosenMethod === 'sum_of_year' ? [] : [4, 4],
-                    backgroundColor: chosenMethod === 'sum_of_year' ? 'rgba(127, 0, 255, 0.12)' : 'transparent',
-                    type: chosenMethod === 'sum_of_year' ? 'bar' : 'line',
-                    fill: false
-                }
-            ];
-
-            depChart = new Chart(ctx, {
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 15, padding: 15 } }
-                    },
-                    scales: {
-                        y: { title: { display: true, text: 'Nilai Depresiasi ($M - Juta Dolar)' } }
-                    }
-                }
-            });
-        }
-
-        // 3. Render Cash Flow Chart
+        // Render Cash Flow Chart
         function renderCashFlowChart(data) {
             const ctx = document.getElementById('cashFlowChart').getContext('2d');
             const years = data.allYearsWithZero;
             
-            // Map cash flows
             const ncfValues = Object.values(data.cash_flow.ncf);
             const cumulativeValues = Object.values(data.cash_flow.cumulative_ncf);
 
-            // Generate conditional bar colors (green for positive, red for negative)
             const barColors = ncfValues.map(v => v >= 0 ? 'rgba(17, 138, 68, 0.65)' : 'rgba(218, 37, 29, 0.65)');
             const borderColors = ncfValues.map(v => v >= 0 ? '#118a44' : '#da251d');
 
@@ -578,61 +465,24 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 15, padding: 15 } }
+                        legend: { position: 'top', labels: { color: '#3a3a3a', boxWidth: 15, padding: 15 } }
                     },
                     scales: {
                         y: {
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: { display: true, text: 'Tahunan NCF ($M)' }
+                            grid: { color: 'rgba(26, 26, 26, 0.06)' },
+                            ticks: { color: '#3a3a3a' },
+                            title: { display: true, text: 'Tahunan NCF ($M)', color: '#3a3a3a' }
                         },
                         y2: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            grid: { drawOnChartArea: false }, // Only draw grid for left axis
-                            title: { display: true, text: 'Kumulatif NCF ($M)' }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 4. Render Sensitivity Chart
-        function renderSensitivityChart(data) {
-            const ctx = document.getElementById('sensitivityChart').getContext('2d');
-            const rates = Object.keys(data.npv_sensitivity);
-            const npvs = Object.values(data.npv_sensitivity);
-
-            sensChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: rates.map(r => r + '%'),
-                    datasets: [{
-                        label: 'NPV Proyek',
-                        data: npvs,
-                        borderColor: '#0054a6',
-                        backgroundColor: 'rgba(0, 84, 166, 0.04)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#0054a6',
-                        pointHoverRadius: 7,
-                        fill: true,
-                        tension: 0.15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { 
-                            title: { display: true, text: 'NPV ($M - Juta Dolar)' }
-                        },
-                        x: {
-                            title: { display: true, text: 'Suku Bunga / Discount Rate (%)' }
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#3a3a3a' },
+                            title: { display: true, text: 'Kumulatif NCF ($M)', color: '#3a3a3a' }
                         }
                     }
                 }

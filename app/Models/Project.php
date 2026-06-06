@@ -23,6 +23,7 @@ class Project extends Model
         'total_reserve',
         'decline_rate',
         'custom_depreciation_rate',
+        'decline_start_year',
     ];
 
     public function user()

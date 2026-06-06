@@ -35,7 +35,6 @@
                     </li>
                     <li class="menu-item {{ Route::is('projects.create') ? 'active' : '' }}">
                         <a href="{{ route('projects.create') }}">
-                            <i class="fa-solid fa-circle-plus"></i>
                             <span>Proyek Baru</span>
                         </a>
                     </li>

@@ -132,6 +132,13 @@
                         <label class="form-label" for="decline_rate">Laju Penurunan Produksi / Decline Rate (%) <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: none;">(Opsional)</span></label>
                         <input type="number" step="any" id="decline_rate" name="decline_rate" class="form-control" value="{{ old('decline_rate', $project->decline_rate) }}" placeholder="Contoh: 10 (Gunakan Decline Curve)" />
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="decline_start_year">Mulai Penurunan (Tahun Ke)</label>
+                        <select id="decline_start_year" name="decline_start_year" class="form-control">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
@@ -193,6 +200,9 @@
             const methodSelect = document.getElementById('depreciation_method');
             const reserveWarning = document.getElementById('reserve-warning');
             const totalReserveInput = document.getElementById('total_reserve');
+            const predictionYearsInput = document.getElementById('prediction_years');
+            const declineStartYearSelect = document.getElementById('decline_start_year');
+            const oldDeclineStartYear = "{{ old('decline_start_year', $project->decline_start_year) }}";
 
             // Pre-existing production data from DB
             const existingProduction = {
@@ -215,6 +225,31 @@
             }
             methodSelect.addEventListener('change', handleMethodChange);
             handleMethodChange(); // Init
+
+            function updateDeclineStartYearOptions() {
+                const known = parseInt(knownYearsInput.value) || 0;
+                const pred = parseInt(predictionYearsInput.value) || 0;
+                const total = known + pred;
+                
+                const currentSelected = declineStartYearSelect.value || oldDeclineStartYear;
+                declineStartYearSelect.innerHTML = '<option value="">Default (Setelah Data Aktual)</option>';
+                
+                for (let i = 1; i <= total; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = `Tahun ${i}`;
+                    if (String(i) === String(currentSelected)) {
+                        opt.selected = true;
+                    }
+                    declineStartYearSelect.appendChild(opt);
+                }
+            }
+
+            knownYearsInput.addEventListener('change', updateDeclineStartYearOptions);
+            predictionYearsInput.addEventListener('change', updateDeclineStartYearOptions);
+            knownYearsInput.addEventListener('input', updateDeclineStartYearOptions);
+            predictionYearsInput.addEventListener('input', updateDeclineStartYearOptions);
+            updateDeclineStartYearOptions(); // Init
 
             // Dynamically generate production inputs on entering Step 2
             function generateProductionFields() {

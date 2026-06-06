@@ -3,8 +3,8 @@
 
     <div class="page-title">
         <span>Proyek Investasi Saya</span>
-        <a href="{{ route('projects.create') }}" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i> Proyek Baru
+        <a href="{{ route('projects.create') }}" class="btn btn-primary" style="text-decoration: none">
+         Proyek Baru
         </a>
     </div>
 
@@ -74,8 +74,8 @@
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </form>
-                        <a href="{{ route('projects.show', $project) }}" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">
-                            <i class="fa-solid fa-chart-column"></i> Detail & Grafik
+                        <a href="{{ route('projects.show', $project) }}" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; text-decoration: none">
+                           Detail & Grafik
                         </a>
                     </div>
                 </div>

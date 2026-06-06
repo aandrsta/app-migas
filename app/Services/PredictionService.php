@@ -166,8 +166,14 @@ class PredictionService
      * @param float|null $declineRate Custom production decline rate in percent (0-100)
      * @return array Predictions and regression parameters
      */
-    public function predict(array $knownYears, array $knownProduction, int $totalYears, float $declineRate = null): array
-    {
+    public function predict(
+        array $knownYears,
+        array $knownProduction,
+        int $totalYears,
+        float $declineRate = null,
+        int $declineStartYear = null,
+        float $totalReserve = null
+    ): array {
         $linear = $this->linearRegression($knownYears, $knownProduction);
         $quadratic = $this->quadraticRegression($knownYears, $knownProduction);
 
@@ -175,22 +181,39 @@ class PredictionService
         $n = count($knownYears);
 
         // 1. Fill known years with actual values
+        $cumulativeProduction = 0.0;
         for ($i = 0; $i < $n; $i++) {
             $predictions[$knownYears[$i]] = (double) $knownProduction[$i];
+            $cumulativeProduction += (double) $knownProduction[$i];
         }
 
         // 2. Predict future years
         $lastKnownYear = empty($knownYears) ? 0 : max($knownYears);
+        $startDeclineFrom = $declineStartYear ?? ($lastKnownYear + 1);
+
         for ($year = $lastKnownYear + 1; $year <= $totalYears; $year++) {
-            if ($declineRate !== null && $declineRate > 0) {
-                // Apply exponential or annual production decline rate from previous year
-                $prevVal = $predictions[$year - 1] ?? 0.0;
-                $val = $prevVal * (1.0 - ($declineRate / 100.0));
+            if ($totalReserve !== null && $totalReserve > 0 && $cumulativeProduction >= $totalReserve) {
+                $val = 0.0;
             } else {
-                // Use linear regression
-                $val = ($linear['m'] * $year) + $linear['b'];
+                if ($declineRate !== null && $declineRate > 0 && $year >= $startDeclineFrom) {
+                    // Apply exponential or annual production decline rate from previous year
+                    $prevVal = $predictions[$year - 1] ?? 0.0;
+                    $val = $prevVal * (1.0 - ($declineRate / 100.0));
+                } else {
+                    // Use linear regression
+                    $val = ($linear['m'] * $year) + $linear['b'];
+                }
+
+                // Cap if it exceeds remaining reserve
+                if ($totalReserve !== null && $totalReserve > 0) {
+                    $remaining = $totalReserve - $cumulativeProduction;
+                    if ($val > $remaining) {
+                        $val = $remaining;
+                    }
+                }
             }
             $predictions[$year] = max(0.0, round($val, 4));
+            $cumulativeProduction += $predictions[$year];
         }
 
         return [

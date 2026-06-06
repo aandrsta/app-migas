@@ -72,6 +72,7 @@ class ProjectController extends Controller
             'total_reserve' => 'nullable|numeric|min:0',
             'decline_rate' => 'nullable|numeric|min:0|max:100',
             'custom_depreciation_rate' => 'nullable|numeric|min:0|max:100',
+            'decline_start_year' => 'nullable|integer|min:1',
             'production' => 'required|array',
             'production.*' => 'required|numeric|min:0',
         ];
@@ -82,6 +83,12 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate($rules);
+
+        // Custom validation: total_reserve must not be less than total actual production entered
+        $totalActualProduction = array_sum($request->input('production', []));
+        if (!empty($validated['total_reserve']) && $validated['total_reserve'] < $totalActualProduction) {
+            return back()->withErrors(['total_reserve' => 'Total cadangan minyak tidak boleh kurang dari total produksi aktual yang dimasukkan (yaitu ' . number_format($totalActualProduction, 2) . ' MBBL).'])->withInput();
+        }
 
         // 1. Create the project
         $project = auth()->user()->projects()->create([
@@ -99,6 +106,7 @@ class ProjectController extends Controller
             'total_reserve' => $validated['total_reserve'] ?? null,
             'decline_rate' => $validated['decline_rate'] ?? null,
             'custom_depreciation_rate' => $validated['custom_depreciation_rate'] ?? null,
+            'decline_start_year' => $validated['decline_start_year'] ?? null,
         ]);
 
         // 2. Save known actual production data
@@ -220,6 +228,7 @@ class ProjectController extends Controller
             'total_reserve' => 'nullable|numeric|min:0',
             'decline_rate' => 'nullable|numeric|min:0|max:100',
             'custom_depreciation_rate' => 'nullable|numeric|min:0|max:100',
+            'decline_start_year' => 'nullable|integer|min:1',
             'production' => 'required|array',
             'production.*' => 'required|numeric|min:0',
         ];
@@ -229,6 +238,12 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate($rules);
+
+        // Custom validation: total_reserve must not be less than total actual production entered
+        $totalActualProduction = array_sum($request->input('production', []));
+        if (!empty($validated['total_reserve']) && $validated['total_reserve'] < $totalActualProduction) {
+            return back()->withErrors(['total_reserve' => 'Total cadangan minyak tidak boleh kurang dari total produksi aktual yang dimasukkan (yaitu ' . number_format($totalActualProduction, 2) . ' MBBL).'])->withInput();
+        }
 
         // 1. Update project configuration
         $project->update([
@@ -246,6 +261,7 @@ class ProjectController extends Controller
             'total_reserve' => $validated['total_reserve'] ?? null,
             'decline_rate' => $validated['decline_rate'] ?? null,
             'custom_depreciation_rate' => $validated['custom_depreciation_rate'] ?? null,
+            'decline_start_year' => $validated['decline_start_year'] ?? null,
         ]);
 
         // 2. Replace production data: delete all old production data first
@@ -297,7 +313,9 @@ class ProjectController extends Controller
             $knownYears,
             $knownProd,
             $project->known_years + $project->prediction_years,
-            $project->decline_rate
+            $project->decline_rate,
+            $project->decline_start_year,
+            $project->total_reserve
         );
 
         // 3. Save forecasted production data to DB

@@ -54,7 +54,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%;">
-            <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard
+          Masuk ke Dashboard
         </button>
     </form>
 
