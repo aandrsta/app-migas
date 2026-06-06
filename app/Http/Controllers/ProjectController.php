@@ -110,13 +110,18 @@ class ProjectController extends Controller
         ]);
 
         // 2. Save known actual production data
+        $productionRecords = [];
         foreach ($validated['production'] as $year => $value) {
-            $project->productionData()->create([
+            $productionRecords[] = [
+                'project_id' => $project->id,
                 'year' => $year,
                 'production' => $value,
                 'is_predicted' => false,
-            ]);
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+        $project->productionData()->insert($productionRecords);
 
         // 3. Run all calculations (predict future production + cash flows)
         $this->runCalculations($project);
@@ -268,13 +273,18 @@ class ProjectController extends Controller
         $project->productionData()->delete();
 
         // 3. Save new actual production data
+        $productionRecords = [];
         foreach ($validated['production'] as $year => $value) {
-            $project->productionData()->create([
+            $productionRecords[] = [
+                'project_id' => $project->id,
                 'year' => $year,
                 'production' => $value,
                 'is_predicted' => false,
-            ]);
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+        $project->productionData()->insert($productionRecords);
 
         // 4. Run recalculations
         $this->runCalculations($project);
@@ -322,14 +332,21 @@ class ProjectController extends Controller
         // Clear any old predictions first
         $project->productionData()->where('is_predicted', true)->delete();
 
+        $predictionRecords = [];
         foreach ($predResult['predictions'] as $year => $prod) {
             if (!in_array($year, $knownYears)) {
-                $project->productionData()->create([
+                $predictionRecords[] = [
+                    'project_id' => $project->id,
                     'year' => $year,
                     'production' => $prod,
                     'is_predicted' => true,
-                ]);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
+        }
+        if (!empty($predictionRecords)) {
+            $project->productionData()->insert($predictionRecords);
         }
 
         // 4. Calculate Net Cash Flows (from Year 0 to N)
@@ -338,8 +355,15 @@ class ProjectController extends Controller
         // 5. Save results to calculations table in database
         $project->calculations()->delete(); // Clear old calculations first
         
+        $calculationRecords = [];
         foreach ($cashFlows as $row) {
-            $project->calculations()->create($row);
+            $row['project_id'] = $project->id;
+            $row['created_at'] = now();
+            $row['updated_at'] = now();
+            $calculationRecords[] = $row;
+        }
+        if (!empty($calculationRecords)) {
+            $project->calculations()->insert($calculationRecords);
         }
     }
 }
