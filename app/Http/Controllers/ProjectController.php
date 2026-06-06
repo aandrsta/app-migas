@@ -33,13 +33,11 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = auth()->user()->projects()->latest()->get();
-
-        // Attach total NCF and NPV to each project on-the-fly for simple dashboard display
-        foreach ($projects as $project) {
-            $project->total_ncf = $project->calculations()->sum('ncf');
-            $project->npv = $project->calculations()->sum('pv_ncf');
-        }
+        $projects = auth()->user()->projects()
+            ->withSum('calculations as total_ncf', 'ncf')
+            ->withSum('calculations as npv', 'pv_ncf')
+            ->latest()
+            ->get();
 
         return view('projects.index', compact('projects'));
     }
@@ -139,16 +137,16 @@ class ProjectController extends Controller
 
         $project->load(['productionData', 'calculations']);
 
-        // 1. Separate actual and predicted production
-        $actualProduction = $project->productionData()
+        // 1. Separate actual and predicted production (in-memory)
+        $actualProduction = $project->productionData
             ->where('is_predicted', false)
-            ->orderBy('year')
-            ->get();
+            ->sortBy('year')
+            ->values();
 
-        $predictedProduction = $project->productionData()
+        $predictedProduction = $project->productionData
             ->where('is_predicted', true)
-            ->orderBy('year')
-            ->get();
+            ->sortBy('year')
+            ->values();
 
         // 2. Run regression parameters on actual production for display in Production Tab info box
         $knownYears = $actualProduction->pluck('year')->toArray();
@@ -159,7 +157,7 @@ class ProjectController extends Controller
 
         // 3. Get depreciation comparison for chart
         $costBase = $project->capital_cost + $project->non_capital_cost;
-        $productionsArray = $project->productionData()->orderBy('year')->pluck('production', 'year')->toArray();
+        $productionsArray = $project->productionData->sortBy('year')->pluck('production', 'year')->toArray();
         
         $depreciationComparison = $this->depreciationService->calculateAll(
             $costBase,
@@ -170,7 +168,7 @@ class ProjectController extends Controller
         );
 
         // 4. Calculate economic indicators
-        $calculations = $project->calculations()->orderBy('year')->get()->toArray();
+        $calculations = $project->calculations->sortBy('year')->toArray();
         
         $npv = $this->economicIndicatorService->calculateNpv($calculations);
         $irr = $this->economicIndicatorService->calculateIrr($calculations);
