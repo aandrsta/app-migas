@@ -14,6 +14,12 @@
         "APP_ROUTES_CACHE": "/tmp/routes.php",
         "APP_SERVICES_CACHE": "/tmp/services.php"
     },
+    "crons": [
+        {
+            "path": "/",
+            "schedule": "*/10 * * * *"
+        }
+    ],
     "routes": [
         {
             "src": "/build/(.*)",
